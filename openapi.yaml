@@ -1,0 +1,517 @@
+openapi: 3.0.3
+info:
+  title: CDLI Search API
+  version: 1.0.0
+  description: API interface for searching artifacts and retrieving metadata from the CDLI.
+
+servers:
+  - url: https://cdli.earth
+
+tags:
+  - name: Search
+    description: |
+      Search for artifacts using metadata filters, publication information,
+      textual content (ATF), identifiers, and more.
+
+  - name: Metadata
+    description: |
+      Retrieve metadata like (genres, languages, periods,
+      proveniences, collections) used across the CDLI.
+
+paths:
+  /search:
+    get:
+      summary: Search CDLI artifacts
+      description: Query artifacts using metadata, publication filters, or transliteration search.
+      tags:
+        - Search
+      parameters:
+        - name: format
+          in: query
+          schema:
+            type: string
+            enum: [json]
+          description: Return response in JSON format
+
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+
+        # Publication filters
+
+        - name: publication_type
+          in: query
+          schema:
+            type: string
+            enum:
+              - primary
+              - history
+              - citation
+              - collation
+              - other
+
+        - name: publication_designation
+          in: query
+          schema:
+            type: string
+
+        - name: publication_authors
+          in: query
+          schema:
+            type: string
+
+        - name: publication_editors
+          in: query
+          schema:
+            type: string
+
+        - name: publication_title
+          in: query
+          schema:
+            type: string
+
+        - name: publication_publisher
+          in: query
+          schema:
+            type: string
+
+        - name: publication_series
+          in: query
+          schema:
+            type: string
+
+        - name: publication_exact_reference
+          in: query
+          schema:
+            type: string
+
+        - name: publication_bibtexkey
+          in: query
+          schema:
+            type: string
+
+        # Artifact metadata
+
+        - name: artifact_type
+          in: query
+          schema:
+            type: string
+
+        - name: material
+          in: query
+          schema:
+            type: string
+
+        - name: collection
+          in: query
+          schema:
+            type: string
+
+        - name: provenience
+          in: query
+          schema:
+            type: string
+
+        - name: written_in
+          in: query
+          schema:
+            type: string
+
+        - name: archive
+          in: query
+          schema:
+            type: string
+
+        - name: period
+          in: query
+          schema:
+            type: string
+
+        - name: artifact_comments
+          in: query
+          schema:
+            type: string
+
+        - name: dates_referenced
+          in: query
+          schema:
+            type: string
+
+        # Textual search
+
+        - name: atf_translation_text
+          in: query
+          schema:
+            type: string
+
+        - name: atf_comments
+          in: query
+          schema:
+            type: string
+
+        - name: atf_structure
+          in: query
+          schema:
+            type: string
+
+        - name: genre
+          in: query
+          schema:
+            type: string
+
+        - name: genre_comments
+          in: query
+          schema:
+            type: string
+
+        - name: language
+          in: query
+          schema:
+            type: string
+
+        - name: asset_annotations
+          in: query
+          schema:
+            type: string
+
+        # Artifact identifiers
+
+        - name: designation
+          in: query
+          schema:
+            type: string
+
+        - name: museum_no
+          in: query
+          schema:
+            type: string
+
+        - name: accession_no
+          in: query
+          schema:
+            type: string
+
+        - name: excavation_no
+          in: query
+          schema:
+            type: string
+
+        - name: id
+          in: query
+          schema:
+            type: string
+
+        - name: all_seal_no
+          in: query
+          schema:
+            type: string
+
+        - name: all_composite_no
+          in: query
+          schema:
+            type: string
+
+        # Credits
+
+        - name: update_authors
+          in: query
+          schema:
+            type: string
+
+        - name: update_external_resource
+          in: query
+          schema:
+            type: string
+
+        # Transliteration search
+
+        - name: atf_transliteration
+          in: query
+          schema:
+            type: string
+
+        - name: atf_transliteration_mode
+          in: query
+          schema:
+            type: string
+            enum:
+              - line
+              - full
+
+        - name: atf_transliteration_case_sensitive
+          in: query
+          schema:
+            type: integer
+            enum: [0, 1]
+
+        - name: atf_transliteration_sign_permutation
+          in: query
+          schema:
+            type: integer
+            enum: [0, 1]
+
+        - name: atf_transliteration_section
+          in: query
+          schema:
+            type: string
+            enum:
+              - seal
+              - obverse
+              - reverse
+              - edge
+
+      responses:
+        "200":
+          description: Search results
+          content:
+            application/json:
+              example:
+                - id: 2
+                  designation: "CDLI Lexical 000002, ex. 066"
+                  excavation_no: "W 06435,b"
+                  museum_no: "VAT 15263"
+                  height: "30.0"
+                  width: "48.0"
+                  artifact_type:
+                    id: 4
+                    artifact_type: "tablet"
+                  period:
+                    id: 4
+                    period: "Uruk III (ca. 3200-3000 BC)"
+                  provenience:
+                    id: 105
+                    provenience: "Uruk (mod. Warka)"
+                  languages:
+                    - language:
+                        id: 16
+                        language: "undetermined"
+                        inline_code: "qpc"
+                  genres:
+                    - genre:
+                        id: 4
+                        genre: "Lexical"
+                  inscription:
+                    id: 2307043
+                    transliteration: "1(N01) , GAL~a SZITA~a1"
+
+  /genres:
+    get:
+      tags:
+        - Metadata
+      summary: Retrieve genres (with optional filtering and pagination)
+      description: |
+        Returns a list of genres from the CDLI.
+      parameters:
+        - name: format
+          in: query
+          schema:
+            type: string
+            enum: [json]
+          description: Return response in JSON format
+        - name: genre
+          in: query
+          schema:
+            type: string
+          description: Filter by genre name (e.g. "Lexical", "Administrative", partial match may work)
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+            minimum: 1
+          description: Page number for pagination
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+            minimum: 1
+            maximum: 100 # reasonable upper bound; adjust if needed
+          description: Number of items per page (supported on this endpoint)
+      responses:
+        "200":
+          description: Genre list (paginated/filtered if parameters used)
+          content:
+            application/json:
+              example:
+                - id: 4
+                  genre: "Lexical"
+                  parent_id: null
+                  child_genres: []
+
+  /languages:
+    get:
+      tags:
+        - Metadata
+      summary: Retrieve languages (with optional filtering and pagination)
+      description: |
+        Returns a list of languages used in CDLI inscriptions.
+      parameters:
+        - name: format
+          in: query
+          schema:
+            type: string
+            enum: [json]
+        - name: language
+          in: query
+          schema:
+            type: string
+          description: Filter by language name (e.g. "Sumerian", "Akkadian")
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+            minimum: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+            minimum: 1
+            maximum: 100
+          description: Number of items per page
+      responses:
+        "200":
+          description: Language list
+          content:
+            application/json:
+              example:
+                - id: 16
+                  sequence: 1
+                  language: "undetermined"
+                  inline_code: "qpc"
+
+  /periods:
+    get:
+      tags:
+        - Metadata
+      summary: Retrieve historical periods (with optional filtering and pagination)
+      description: |
+        Returns the list of periods defined in CDLI.
+      parameters:
+        - name: format
+          in: query
+          schema:
+            type: string
+            enum: [json]
+        - name: period
+          in: query
+          schema:
+            type: string
+          description: Filter by period name (e.g. "Uruk III", "Old Babylonian")
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+            minimum: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+            minimum: 1
+            maximum: 100
+          description: Number of items per page
+      responses:
+        "200":
+          description: Period list
+          content:
+            application/json:
+              example:
+                - id: 4
+                  sequence: 5
+                  period: "Uruk III (ca. 3200-3000 BC)"
+
+  /proveniences:
+    get:
+      tags:
+        - Metadata
+      summary: Retrieve proveniences (with optional filtering and pagination)
+      description: |
+        Returns the list of archaeological proveniences / sites.
+      parameters:
+        - name: format
+          in: query
+          schema:
+            type: string
+            enum: [json]
+        - name: provenience
+          in: query
+          schema:
+            type: string
+          description: Filter by provenience name (e.g. "Uruk (mod. Warka)", "Nippur")
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+            minimum: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+            minimum: 1
+            maximum: 100
+          description: Number of items per page
+      responses:
+        "200":
+          description: Provenience list
+          content:
+            application/json:
+              example:
+                - id: 105
+                  provenience: "Uruk (mod. Warka)"
+                  region_id: 8
+
+  /collections:
+    get:
+      tags:
+        - Metadata
+      summary: Retrieve collections (with optional filtering and pagination)
+      description: |
+        Returns the list of museums / collections holding CDLI artifacts.
+      parameters:
+        - name: format
+          in: query
+          schema:
+            type: string
+            enum: [json]
+        - name: collection
+          in: query
+          schema:
+            type: string
+          description: Filter by collection name (e.g. "Vorderasiatisches Museum, Berlin")
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+            minimum: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+            minimum: 1
+            maximum: 100
+          description: Number of items per page
+      responses:
+        "200":
+          description: Collection list
+          content:
+            application/json:
+              example:
+                - id: 215
+                  collection: "Vorderasiatisches Museum, Berlin, Germany"
+                  country_iso: "DEU"
